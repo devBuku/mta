@@ -1,1 +1,1 @@
-# mta
+MERN + Typescript Authentication App

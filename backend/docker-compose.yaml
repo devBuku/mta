@@ -1,0 +1,9 @@
+services:
+  mongo:
+    image: mongo
+    container_name: uber_mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data_mongo:/data/db
+    restart: unless-stopped
