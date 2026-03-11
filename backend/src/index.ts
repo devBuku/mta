@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { APP_ORIGIN, NODE_ENV, PORT } from "./constants/env";
 import connectToDb from "./config/db";
+import errorHandler from "./middleware/errorHandler";
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(
 app.use(cookieParser());
 
 app.get("/", function (req, res) {
+  throw new Error("Test Error");
   res.status(200).json({ status: "healthy" });
 });
 
