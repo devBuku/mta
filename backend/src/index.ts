@@ -1,27 +1,13 @@
 import express from "express";
-import cors from "cors";
-import cookieParser from "cookie-parser";
 import connectToDb from "./config/db";
-import { APP_ORIGIN, NODE_ENV, PORT } from "./constants/env";
+import { NODE_ENV, PORT } from "./contants/env";
 const app = express();
 
-const port = PORT;
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(
-  cors({
-    origin: APP_ORIGIN,
-    credentials: true,
-  }),
-);
-app.use(cookieParser());
-
 app.get("/", function (req, res) {
-  res.status(200).json({ status: "Healthy" });
+  res.status(200).json({ status: "healthy" });
 });
 
-app.listen(port, async function () {
-  console.log(`Server is running on port ${port} in ${NODE_ENV} enviorment...`);
+app.listen(PORT, async function () {
+  console.log(`App is running on port ${PORT} on ${NODE_ENV} enviorment`);
   await connectToDb();
 });
