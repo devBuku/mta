@@ -4,7 +4,6 @@ import connectToDb from "./config/db";
 import { APP_ORIGIN, NODE_ENV, PORT } from "./constants/env";
 import cookieParser from "cookie-parser";
 import errorHandler from "./middlewares/errorHandler";
-import catchErrors from "./utils/catchError";
 import { OK } from "./constants/http";
 import authRouter from "./routes/auth.route";
 
