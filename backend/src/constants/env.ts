@@ -1,11 +1,13 @@
-const getEnv = function (key: string, defaultValue?: string): string {
+const getEnv = (key: string, defaultValue?: string): string => {
+
   const value = process.env[key] || defaultValue;
 
   if (value === undefined) {
-    throw new Error(`Missing enviorment variable ${key}`);
+    throw new Error(`Missing enviorment variable: ${key}`);
   }
+
   return value;
-};
+}
 
 export const PORT = getEnv("PORT");
 export const NODE_ENV = getEnv("NODE_ENV");

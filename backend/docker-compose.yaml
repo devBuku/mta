@@ -1,3 +1,7 @@
+volumes:
+  mongo_data:
+    name: mta_mongo_data
+
 services:
   mongo:
     image: mongo
@@ -5,5 +9,5 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - ./data_mongo:/data/db
+      - mongo_data:/data/db
     restart: unless-stopped

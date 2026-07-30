@@ -1,14 +1,15 @@
 import mongoose from "mongoose";
-import { MONGO_URI } from "../constants/env";
+import { MONGO_URI } from "../constants/env.js";
 
-const connectToDb = async function () {
+const connectToDb = async () => {
   try {
-    await mongoose.connect(MONGO_URI);
-    console.log(`Connected to database.`);
-  } catch (error) {
-    console.log(`Could not connect to the database: ${error}`);
+    const conn = await mongoose.connect(MONGO_URI);
+    console.log('Successfully connected to DB:', conn.connection.host)
+  }
+  catch(error) {
+    console.error("Error in connecting to DB:", error);
     process.exit(1);
   }
-};
+}
 
 export default connectToDb;
