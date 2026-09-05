@@ -4,7 +4,7 @@ volumes:
 
 services:
   mongo:
-    image: mongo
+    image: mongo:7.0.40
     container_name: mta
     ports:
       - "27017:27017"
