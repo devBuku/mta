@@ -1,12 +1,11 @@
-import jwt from "jsonwebtoken";
 import VerificationCodeType from "../constants/verificationCodeTypes";
 import { Session } from "../models/session.model";
 import { User, UserDocument } from "../models/user.model";
 import { VerificationCode } from "../models/verificationCode.model";
 import { oneYearFromNow } from "../utils/date";
-import { JWT_REFRESH_SECRET, JWT_SECRET } from "../constants/env";
 import apiAssert from "../utils/apiAssert";
-import { CONFLICT } from "../constants/http";
+import { CONFLICT, UNAUTHORIZED } from "../constants/http";
+import signToken, { refreshTokenSignOptions } from "../utils/jwt";
 
 type CreateAccountParams = {
     email: string;
@@ -48,18 +47,55 @@ const createAccount = async function (
         ...(data.userAgent ? { userAgent: data.userAgent } : {}),
     });
 
-    const refreshToken = jwt.sign(
+    const refreshToken = signToken(
         { sessionId: session._id },
-        JWT_REFRESH_SECRET,
-        { expiresIn: "30d", audience: ["user"] },
+        refreshTokenSignOptions,
     );
 
-    const accessToken = jwt.sign(
-        { userId: user._id, sessionId: session._id },
-        JWT_SECRET,
-        { expiresIn: "15m", audience: ["user"] },
-    );
+    const accessToken = signToken({ userId: user._id, sessionId: session._id });
+
     return { user: user.omitPassword(), accessToken, refreshToken };
 };
 
-export { createAccount };
+type LoginParams = {
+    email: string;
+    password: string;
+    userAgent?: string | undefined;
+};
+
+type LoginUserResponse = {
+    user: Pick<
+        UserDocument,
+        "_id" | "email" | "verified" | "createdAt" | "updatedAt"
+    >;
+    accessToken: string;
+    refreshToken: string;
+};
+
+const loginUser = async function (
+    data: LoginParams,
+): Promise<LoginUserResponse> {
+    const user = await User.findOne({ email: data.email });
+    apiAssert(user, UNAUTHORIZED, "Invalid Email or Password");
+
+    const isValid = await user.comparePassword(data.password);
+    apiAssert(isValid, UNAUTHORIZED, "Invalid Email or Password");
+
+    const userId = user._id;
+
+    const session = await Session.create({
+        userId: userId,
+        ...(data.userAgent ? { userAgent: data.userAgent } : {}),
+    });
+
+    const refreshToken = signToken(
+        { sessionId: session._id },
+        refreshTokenSignOptions,
+    );
+
+    const accessToken = signToken({ userId: user._id, sessionId: session._id });
+
+    return { user: user.omitPassword(), accessToken, refreshToken };
+};
+
+export { createAccount, loginUser };
