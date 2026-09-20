@@ -6,7 +6,8 @@ import { Express, Response } from "express";
 import { APP_ORIGIN, NODE_ENV, PORT } from "./constants/env";
 import { connectToDb } from "./config/db";
 import errorHandler from "./middlewares/errorHandler";
-import { OK } from "./constants/http";
+import { NOT_FOUND, OK } from "./constants/http";
+import authRouter from "./routes/auth.route";
 
 const app: Express = express();
 
@@ -24,10 +25,12 @@ app.get("/health", function (_req, res: Response<{ message: string }>): void {
     res.status(OK).json({ message: `I am healthy` });
 });
 
+app.use("/auth", authRouter);
+
 app.use(errorHandler);
 
 app.use(function (_req, res: Response<{ message: string }>) {
-    res.status(404).json({ message: `Route not found` });
+    res.status(NOT_FOUND).json({ message: `Route not found` });
 });
 
 (async function () {
