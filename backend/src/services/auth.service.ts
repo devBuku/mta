@@ -5,6 +5,8 @@ import { User, UserDocument } from "../models/user.model";
 import { VerificationCode } from "../models/verificationCode.model";
 import { oneYearFromNow } from "../utils/date";
 import { JWT_REFRESH_SECRET, JWT_SECRET } from "../constants/env";
+import apiAssert from "../utils/apiAssert";
+import { CONFLICT } from "../constants/http";
 
 type CreateAccountParams = {
     email: string;
@@ -13,7 +15,10 @@ type CreateAccountParams = {
 };
 
 type CreateAccountResponse = {
-    user: UserDocument;
+    user: Pick<
+        UserDocument,
+        "_id" | "email" | "verified" | "createdAt" | "updatedAt"
+    >;
     accessToken: string;
     refreshToken: string;
 };
@@ -25,9 +30,7 @@ const createAccount = async function (
         email: data.email,
     });
 
-    if (existingUser) {
-        throw new Error("User already exists!");
-    }
+    apiAssert(!existingUser, CONFLICT, "Email already in use");
 
     const user = await User.create({
         email: data.email,
@@ -56,7 +59,7 @@ const createAccount = async function (
         JWT_SECRET,
         { expiresIn: "15m", audience: ["user"] },
     );
-    return { user, accessToken, refreshToken };
+    return { user: user.omitPassword(), accessToken, refreshToken };
 };
 
 export { createAccount };

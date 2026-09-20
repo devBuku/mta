@@ -25,7 +25,7 @@ const registerHandler = catchErrors(async function (req, res) {
     const { user, accessToken, refreshToken } = await createAccount(request);
     setAuthCookie({ res, accessToken, refreshToken })
         .status(CREATED)
-        .json({ user: { email: user.email } });
+        .json({ user });
     return;
 });
 
