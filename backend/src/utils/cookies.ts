@@ -3,6 +3,7 @@ import { NODE_ENV } from "../constants/env";
 import { fifteenMinutesFromNow, thirtyDaysFromNow } from "./date";
 
 const secure = NODE_ENV !== "development";
+export const REFRESH_PATH = "/auth/refresh";
 
 const defaults: CookieOptions = {
     sameSite: "strict",
@@ -10,18 +11,18 @@ const defaults: CookieOptions = {
     secure,
 };
 
-const getAccessTokenCookieOptions = function (): CookieOptions {
+export const getAccessTokenCookieOptions = function (): CookieOptions {
     return {
         ...defaults,
         expires: fifteenMinutesFromNow(),
     };
 };
 
-const getRefreshTokenCookieOptions = function (): CookieOptions {
+export const getRefreshTokenCookieOptions = function (): CookieOptions {
     return {
         ...defaults,
         expires: thirtyDaysFromNow(),
-        path: "/auth/refresh",
+        path: REFRESH_PATH,
     };
 };
 
@@ -41,4 +42,10 @@ const setAuthCookie = function (data: SetAuthCookieParams) {
         );
 };
 
-export default setAuthCookie;
+const clearAuthCookie = function (res: Response) {
+    return res.clearCookie("accessToken").clearCookie("refreshToken", {
+        path: REFRESH_PATH,
+    });
+};
+
+export { setAuthCookie, clearAuthCookie };
